@@ -149,17 +149,15 @@
       <h2>Laatste rapport</h2>
       <div class="meta" id="meta-info">Nog geen data geladen.</div>
       <button id="refresh-btn">Ververs rapport</button>
+      <button id="generate-btn" style="margin-left:0.5rem;">Genereer nieuw rapport</button>
       <div id="status"></div>
     </div>
 
     <div class="card">
-  <h2>Laatste rapport</h2>
-  <div class="meta" id="meta-info">Nog geen data geladen.</div>
-  <button id="refresh-btn">Ververs rapport</button>
-  <button id="generate-btn" style="margin-left:0.5rem;">Genereer nieuw rapport</button>
-  <div id="status"></div>
-</div>
-
+      <h2>Shortlist (top aandelen)</h2>
+      <div id="shortlist-container">
+        <div class="meta">Nog geen shortlist geladen.</div>
+      </div>
     </div>
 
     <div class="card">
@@ -173,11 +171,11 @@
     const BACKEND_URL = "https://ai-assistent-backend-g25p.onrender.com";
 
     const refreshBtn = document.getElementById("refresh-btn");
+    const generateBtn = document.getElementById("generate-btn");
     const statusEl = document.getElementById("status");
     const metaEl = document.getElementById("meta-info");
     const shortlistContainer = document.getElementById("shortlist-container");
     const rapportTextEl = document.getElementById("rapport-text");
-    const generateBtn = document.getElementById("generate-btn");
 
     function riskClass(score) {
       if (score <= 3) return "risk-low";
@@ -203,29 +201,6 @@
           statusEl.textContent = "";
           return;
         }
-async function generateNewReport() {
-  statusEl.textContent = "Nieuw rapport genereren...";
-  statusEl.classList.remove("error");
-
-  try {
-    const res = await fetch(BACKEND_URL + "/shortlist-report-demo-save");
-    if (!res.ok) {
-      throw new Error("HTTP " + res.status);
-    }
-    const data = await res.json();
-    if (data.status !== "ok") {
-      throw new Error(data.error || "Onbekende fout bij opslaan van rapport.");
-    }
-
-    statusEl.textContent = "Nieuw rapport gegenereerd en opgeslagen. Rapport wordt opnieuw geladen...";
-    // Na succesvol opslaan: opnieuw het laatste rapport ophalen
-    await loadLatestReport();
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = "Fout bij genereren van nieuw rapport.";
-    statusEl.classList.add("error");
-  }
-}
 
         const report = data.report;
         const year = report.year;
@@ -273,14 +248,34 @@ async function generateNewReport() {
       }
     }
 
-    refreshBtn.addEventListener("click", loadLatestReport);
+    async function generateNewReport() {
+      statusEl.textContent = "Nieuw rapport genereren...";
+      statusEl.classList.remove("error");
+
+      try {
+        const res = await fetch(BACKEND_URL + "/shortlist-report-demo-save");
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+        if (data.status !== "ok") {
+          throw new Error(data.error || "Onbekende fout bij opslaan van rapport.");
+        }
+
+        statusEl.textContent = "Nieuw rapport gegenereerd en opgeslagen. Rapport wordt opnieuw geladen...";
+        await loadLatestReport();
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Fout bij genereren van nieuw rapport.";
+        statusEl.classList.add("error");
+      }
+    }
 
     refreshBtn.addEventListener("click", loadLatestReport);
-generateBtn.addEventListener("click", generateNewReport);
+    generateBtn.addEventListener("click", generateNewReport);
 
-// Automatisch 1x bij laden van de pagina
-loadLatestReport();
-
+    // Automatisch 1x bij laden van de pagina
+    loadLatestReport();
   </script>
 </body>
 </html>
