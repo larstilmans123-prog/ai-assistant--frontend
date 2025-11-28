@@ -188,7 +188,7 @@
       statusEl.classList.remove("error");
 
       try {
-        const res = await fetch(BACKEND_URL + "/reports/latest/");
+        const res = await fetch(BACKEND_URL + "/reports/latest");
         if (!res.ok) {
           const txt = await res.text();
           throw new Error("HTTP " + res.status + " – " + txt);
@@ -253,7 +253,7 @@
       statusEl.classList.remove("error");
 
       try {
-        const res = await fetch(BACKEND_URL + "/shortlist-report-demo-save/");
+        const res = await fetch(BACKEND_URL + "/shortlist-report-demo-save");
         if (!res.ok) {
           const txt = await res.text();
           throw new Error("HTTP " + res.status + " – " + txt);
