@@ -203,6 +203,29 @@
           statusEl.textContent = "";
           return;
         }
+async function generateNewReport() {
+  statusEl.textContent = "Nieuw rapport genereren...";
+  statusEl.classList.remove("error");
+
+  try {
+    const res = await fetch(BACKEND_URL + "/shortlist-report-demo-save");
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
+    const data = await res.json();
+    if (data.status !== "ok") {
+      throw new Error(data.error || "Onbekende fout bij opslaan van rapport.");
+    }
+
+    statusEl.textContent = "Nieuw rapport gegenereerd en opgeslagen. Rapport wordt opnieuw geladen...";
+    // Na succesvol opslaan: opnieuw het laatste rapport ophalen
+    await loadLatestReport();
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "Fout bij genereren van nieuw rapport.";
+    statusEl.classList.add("error");
+  }
+}
 
         const report = data.report;
         const year = report.year;
@@ -252,8 +275,12 @@
 
     refreshBtn.addEventListener("click", loadLatestReport);
 
-    // Automatisch 1x bij laden van de pagina
-    loadLatestReport();
+    refreshBtn.addEventListener("click", loadLatestReport);
+generateBtn.addEventListener("click", generateNewReport);
+
+// Automatisch 1x bij laden van de pagina
+loadLatestReport();
+
   </script>
 </body>
 </html>
