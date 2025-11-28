@@ -168,7 +168,7 @@
 
   <script>
     // ⬇️ VUL HIER JE BACKEND URL IN (ZONDER SLASH OP HET EINDE)
-    const BACKEND_URL = "https://ai-assistent-backend-g25p.onrender.com";
+    const BACKEND_URL = "https://ai-assistent-backend-g25p.onrender.com/";
 
     const refreshBtn = document.getElementById("refresh-btn");
     const generateBtn = document.getElementById("generate-btn");
@@ -188,9 +188,10 @@
       statusEl.classList.remove("error");
 
       try {
-        const res = await fetch(BACKEND_URL + "/reports/latest");
+        const res = await fetch(BACKEND_URL + "/reports/latest/");
         if (!res.ok) {
-          throw new Error("HTTP " + res.status);
+          const txt = await res.text();
+          throw new Error("HTTP " + res.status + " – " + txt);
         }
         const data = await res.json();
 
@@ -205,7 +206,6 @@
         const report = data.report;
         const year = report.year;
         const month = report.month;
-        const createdAt = report.created_at;
         const shortlist = report.shortlist_json || [];
         const tekst = report.report_text || "";
 
@@ -243,7 +243,7 @@
         statusEl.textContent = "Laatste rapport succesvol geladen.";
       } catch (err) {
         console.error(err);
-        statusEl.textContent = "Fout bij laden van rapport.";
+        statusEl.textContent = "Fout bij laden van rapport (" + err.message + ").";
         statusEl.classList.add("error");
       }
     }
@@ -253,9 +253,10 @@
       statusEl.classList.remove("error");
 
       try {
-        const res = await fetch(BACKEND_URL + "/shortlist-report-demo-save");
+        const res = await fetch(BACKEND_URL + "/shortlist-report-demo-save/");
         if (!res.ok) {
-          throw new Error("HTTP " + res.status);
+          const txt = await res.text();
+          throw new Error("HTTP " + res.status + " – " + txt);
         }
         const data = await res.json();
         if (data.status !== "ok") {
@@ -266,7 +267,7 @@
         await loadLatestReport();
       } catch (err) {
         console.error(err);
-        statusEl.textContent = "Fout bij genereren van nieuw rapport.";
+        statusEl.textContent = "Fout bij genereren van nieuw rapport (" + err.message + ").";
         statusEl.classList.add("error");
       }
     }
